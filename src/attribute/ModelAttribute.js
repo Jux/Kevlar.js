@@ -83,7 +83,7 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 	 */
 	valuesAreEqual : function( oldValue, newValue ) {
 		// We can't instantiate two different Models with the same id that have different references, so if the references are the same, they are equal
-		return oldValue === newValue;
+		return Kevlar.util.Object.isEqual( oldValue, newValue );
 	},
 	
 	

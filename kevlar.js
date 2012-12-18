@@ -4740,7 +4740,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 	 *   change of the old value, or false if the values are different, and the new value should be taken as a change.
 	 */
 	valuesAreEqual : function( oldValue, newValue ) {
-		return Kevlar.util.Object.isEqual( oldValue, newValue );
+		return Kevlar.util.Object.isEqual( oldValue, newValue, true );
 	},
 	
 	

@@ -47,87 +47,18 @@ Kevlar.util.Object = {
 	},
 	
 	
-	
-	
-	/** 
-	 * Tests if `a` and `b` are equal.
+	/**
+	 * Compares two arguments.  Performs deep comparison on objects to see if the are the same
+	 * 
+	 * Proxy to _.isEqual method
 	 * 
 	 * @method isEqual
-	 * @param {Object} a
-	 * @param {Object} b
-	 * @param {Boolean} [deep=true] If true, will do a deep compare of objects/arrays. Set to false for a shallow compare.
+	 * @param value1,
+	 * @param value2
 	 * @return {Boolean}
 	 */
-	isEqual: function( a, b, deep ) {
-		if( typeof deep === 'undefined' ) {
-			deep = true;
-		}
-		
-		if( typeof a !== typeof b ) { return false; }
-		
-		if( typeof a !== 'object' ) {
-			// simple types
-			if( a !== b ) { return false; }
-			
-		} else {
-			// Double equals on a and b == null, but strict comparison on the actual comparison of the falsy's
-			if( a == null || b == null ) { return a === b; }
-			
-			// Arrays have to be handled separately... Otherwise {} could be considered the same as []
-			if( Kevlar.isArray( a ) !== Kevlar.isArray( b ) ) {
-				return false;
-			}
-			
-			var className = Object.prototype.toString.call( a );
-			if( className != Object.prototype.toString.call( b ) ) { return false; }
-			switch( className ) {
-				case '[object String]' :
-					return a === String( b );
-					
-				case '[object Number]' :
-					return a !== +a ? b !== +b : (a === 0 ? 1 / a === 1 / b : a === +b);
-					
-				case '[object Date]' : 
-				case '[object Boolean]' :
-					return +a === +b;
-					
-				case '[object RegExp]' :
-					return a.source === b.source &&
-					       a.global === b.global &&
-					       a.multiline === b.multiline &&
-					       a.ignoreCase === b.ignoreCase;
-			}
-			
-			
-			// Make sure there are the same number of keys in each object
-			var objLength = Kevlar.util.Object.length;  // no 'this' reference for friendly out of scope calls
-			if( objLength( a ) !== objLength( b ) ) { return false; }
-			
-			for( var p in a ) {
-				if(typeof(a[p]) !== typeof(b[p])) { return false; }
-				if((a[p]===null) !== (b[p]===null)) { return false; }
-				switch (typeof(a[p])) {
-					case 'undefined':
-						if (typeof(b[p]) != 'undefined') { return false; }
-						break;
-					case 'object':
-						if( a[p]!==null && b[p]!==null && ( a[p].constructor.toString() !== b[p].constructor.toString() || ( deep ? !Kevlar.util.Object.isEqual(a[p], b[p] ) : a[p] !== b[p] ) ) ) {  // NOTE: full call to Kevlar.util.Object.isEqual (instead of this.isEqual) to allow for friendly out-of-scope calls 
-							return false;
-						}
-						break;
-					case 'function':
-						if(a[p].toString() != b[p].toString()) { return false; }
-						break;
-					default:
-						if (a[p] !== b[p]) {
-							return false;
-						}
-				}
-			}
-		}
-		return true;
-	},
-	
+	isEqual: _.isEqual,
+
 	
 	/**
 	 * Returns the number of properties that belong to a given object. Does not include

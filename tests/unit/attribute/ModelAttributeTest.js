@@ -31,8 +31,9 @@ tests.unit.attribute.add( new Ext.test.TestSuite( {
 				Y.Assert.fail( "The constructor should have thrown an error if the modelClass config was provided but was undefined. This is to help with debugging when late binding for the modelClass is needed." );
 			}
 		},
-		
-		
+
+		 
+
 		/*
 		 * Test valuesAreEqual()
 		 */
@@ -83,6 +84,27 @@ tests.unit.attribute.add( new Ext.test.TestSuite( {
 				
 				var result = this.attribute.valuesAreEqual( model1, model2 );
 				Y.Assert.isFalse( result );
+			},
+
+			"valuesAreEqual() should return true when the user passes in the same nonreference type values": function(){
+				var result = this.attribute.valuesAreEqual("true", "true");
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return true when the user passes in two same nonreference type values that do not have any values inside of them": function(){
+				var result =  this.attribute.valuesAreEqual({}, {});
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return true when the user passes in two same nonreference type values with the same values": function(){
+				var result =  this.attribute.valuesAreEqual({ val: 1, fail: false }, {val: 1, fail: false});
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return false when the user passes in two same nonreference type values with different values": function(){
+				var result = this.attribute.valuesAreEqual({ val: 1, fail: false }, {val: 1, fail: true});
+
+				Y.Assert.isFalse(result);
 			}
 		},
 		

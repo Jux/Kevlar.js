@@ -58,6 +58,47 @@ tests.integration.add( new Ext.test.TestSuite( {
 				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
 			},
 
+			// Tests making sure that the same type/id returns the same model instance, and combines the data
+			
+			"Instantiating two models of both the same type, and which have the same instance ID, and passing in a true flag as the second value should prevent the model from using the new data" : function() {
+				var Model = Kevlar.Model.extend( {
+					attributes : [ 'id', 'name' ],
+					idAttribute : 'id'
+				} );
+				
+				var changeEventFired = false;
+
+				var model1 = new Model( { id: 1, name: 'firstValue' } );
+				model1.on('change:name', function(){
+					changeEventFired = true;
+				});
+
+				var model2 = new Model( { id: 1, name: 'secondValue' }, true );
+				
+				// Make sure that only one model was created for id 1
+				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
+				Y.Assert.isFalse(changeEventFired);
+			},
+
+			"Instantiating two models of both the same type, and which have the same instance ID, and not passing in a true flag as the second value should set the new data and cause change events" : function() {
+				var Model = Kevlar.Model.extend( {
+					attributes : [ 'id', 'name' ],
+					idAttribute : 'id'
+				} );
+				var changeEventFired = false;
+
+				var model1 = new Model( { id: 1, name: 'firstValue' } );
+				model1.on('change:name', function(){
+					changeEventFired = true;
+				});
+				
+				var model2 = new Model( { id: 1, name: 'secondValue' } );
+				
+				// Make sure that only one model was created for id 1
+				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
+				Y.Assert.isTrue(changeEventFired);
+			},
+
 
 			"Instantiating one model and setting the ID later, then instantiating another with the same ID, the two models should point to the same instance" : function() {
 				var Model = Kevlar.Model.extend( {

@@ -73,6 +73,7 @@ tests.integration.add( new Ext.test.TestSuite( {
 					changeEventFired = true;
 				});
 
+				// Passing in true will prevent the data from overwriting the first dataset but the model returned/created will still point to the original model
 				var model2 = new Model( { id: 1, name: 'secondValue' }, true );
 				
 				// Make sure that only one model was created for id 1
@@ -91,7 +92,7 @@ tests.integration.add( new Ext.test.TestSuite( {
 				model1.on('change:name', function(){
 					changeEventFired = true;
 				});
-				
+
 				var model2 = new Model( { id: 1, name: 'secondValue' } );
 				
 				// Make sure that only one model was created for id 1

@@ -252,7 +252,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	 * @constructor 
 	 * @param {Object} [data] Any initial data for the {@link #cfg-attributes attributes}, specified in an object (hash map). See {@link #set}.
 	 */
-	constructor : function( data ) {
+	constructor : function( data, avoidOverwritingData ) {
 		var me = this;
 		
 		// Default the data to an empty object
@@ -268,10 +268,12 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		// with the same ID.
 		me = Kevlar.ModelCache.get( me, data[ me.idAttribute ] );
 		if( me !== this ) {
-			me.set( data );   // set any provided initial data to the already-existing instance (as to combine them),
+			// If this option is passed in, the model will not overwrite a currently existing model with the new data given and will instead just return the instance
+			if(avoidOverwritingData !== true){
+				me.set( data );   // set any provided initial data to the already-existing instance (as to combine them),
+			} 
 			return me;        // and then return the already-existing instance
 		}
-		
 		
 		// --------------------------
 		

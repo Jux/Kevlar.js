@@ -288,6 +288,32 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		}
 		
 		
+		// Set the default values for attributes that don't have an initial value.
+		var attributes = me.attributes,  // me.attributes is a hash of the Attribute objects, keyed by their name
+		    attributeDefaultValue;
+		for( var name in attributes ) {
+			if( data[ name ] === undefined && ( attributeDefaultValue = attributes[ name ].getDefaultValue() ) !== undefined ) {
+				data[ name ] = attributeDefaultValue;
+			}
+		}
+		
+		// Initialize the underlying data object, which stores all attribute values
+		me.data = {};
+		
+		// Initialize the data hash for storing attribute names of modified data, and their original values (see property description)
+		me.modifiedData = {};
+		
+		// Initialize the embeddedDataComponentChangeHandlers and embeddedCollectionAddRemoveReorderHandlers hashmaps
+		me.embeddedDataComponentChangeHandlers = {};
+		me.embeddedCollectionAddRemoveReorderHandlers = {};
+		
+		// Set the initial data / defaults, if we have any
+		me.set( data );
+		me.commit();  // and because we are initializing, the data is not dirty
+				
+		// Call hook method for subclasses
+		me.initialize();
+		
 		me.addEvents(
 			/**
 			 * Fires when a {@link Kevlar.attribute.Attribute} in the Model has changed its value. This is a 
@@ -354,33 +380,6 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			 */
 			'destroy'
 		);
-		
-		
-		// Set the default values for attributes that don't have an initial value.
-		var attributes = me.attributes,  // me.attributes is a hash of the Attribute objects, keyed by their name
-		    attributeDefaultValue;
-		for( var name in attributes ) {
-			if( data[ name ] === undefined && ( attributeDefaultValue = attributes[ name ].getDefaultValue() ) !== undefined ) {
-				data[ name ] = attributeDefaultValue;
-			}
-		}
-		
-		// Initialize the underlying data object, which stores all attribute values
-		me.data = {};
-		
-		// Initialize the data hash for storing attribute names of modified data, and their original values (see property description)
-		me.modifiedData = {};
-		
-		// Initialize the embeddedDataComponentChangeHandlers and embeddedCollectionAddRemoveReorderHandlers hashmaps
-		me.embeddedDataComponentChangeHandlers = {};
-		me.embeddedCollectionAddRemoveReorderHandlers = {};
-		
-		// Set the initial data / defaults, if we have any
-		me.set( data );
-		me.commit();  // and because we are initializing, the data is not dirty
-		
-		// Call hook method for subclasses
-		me.initialize();
 	},
 	
 	

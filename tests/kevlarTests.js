@@ -7622,6 +7622,8 @@ tests.unit.util.add( new Ext.test.TestSuite( {
 				var f = {a: 'text', b:[1,0], f: function(){ this.f = this.b; }};
 				var g = {a: 'text', b:[1,0], f: function(){ this.f = this.b; }};
 				var h = {a: 'text', b:[1,0], f: function(){ this.a = this.b; }};
+				
+
 				var i = {
 					a: 'text',
 					c: {
@@ -7640,16 +7642,24 @@ tests.unit.util.add( new Ext.test.TestSuite( {
 						}
 					}
 				};
+				
+
 				var k = {a: 'text', b: null};
 				var l = {a: 'text', b: undefined};
 				
 				Y.Assert.isTrue( isEqual( a, b ), "Error w/ object comparison. a !== b" );
 				Y.Assert.isFalse( isEqual( a, c ), "Error w/ object comparison. a === c" );
 				Y.Assert.isFalse( isEqual( c, d ), "Error w/ object comparison. c === d" );
-				Y.Assert.isFalse( isEqual( a, e ), "Error w/ object comparison. a === e" );
-				Y.Assert.isTrue( isEqual( f, g ), "Error w/ object comparison. f !== g" );
+				Y.Assert.isFalse( isEqual( a, e ), "Error w/ object comparison. a === e" );			
+
 				Y.Assert.isFalse( isEqual( g, h ), "Error w/ object comparison. g === h" );
-				Y.Assert.isTrue( isEqual( i, j ), "Error w/ object comparison. i !== j" );
+
+				// Removed these tests as we have replaced Kevlars isEqual method is now _.isEqual
+				// Underscore does not treat two different functions with different references as the same function, even if the body of the function is writtent the same
+				//Y.Assert.isTrue( isEqual( f, g ), "Error w/ object comparison. f !== g" );
+				//Y.Assert.isTrue( isEqual( i, j ), "Error w/ object comparison. i !== j" );
+
+
 				Y.Assert.isFalse( isEqual( d, k ), "Error w/ object comparison. d === k" );
 				Y.Assert.isFalse( isEqual( k, i ), "Error w/ object comparison. k === i" );
 			},

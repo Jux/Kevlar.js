@@ -64,7 +64,7 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 		// Check if the user provided a modelClass, but the value is undefined. This means that they specified
 		// a class that either doesn't exist, or doesn't exist yet, and we should give them a warning.
 		if( 'modelClass' in this && this.modelClass === undefined ) {
-			throw new Error( "The 'modelClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
+			new Kevlar.Error( "The 'modelClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
 			                 "exist just yet. Consider using the String or Function form of the modelClass config for late binding, if needed" );
 		}
 	},
@@ -112,12 +112,12 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 				modelClass = this.resolveGlobalPath( modelClass );  // changes the string "a.b.c" into the value at `window.a.b.c`
 				
 				if( !modelClass ) {
-					throw new Error( "The string value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The string value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
 				}
 			} else if( typeof modelClass === 'function' && !Class.isSubclassOf( modelClass, Kevlar.Model ) ) {  // it's not a Kevlar.Model subclass, so it must be an anonymous function. Run it, so it returns the Model reference we need
 				this.modelClass = modelClass = modelClass();
 				if( !modelClass ) {
-					throw new Error( "The function value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The function value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
 				}
 			}
 			
@@ -140,7 +140,7 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 	afterSet : function( model, value ) {
 		// Enforce that the value is either null, or a Kevlar.Model
 		if( value !== null && !( value instanceof Kevlar.Model ) ) {
-			throw new Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Model subclass" );
+			new Kevlar.Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Model subclass" );
 		}
 		
 		if( this.embedded && value instanceof Kevlar.Model ) {

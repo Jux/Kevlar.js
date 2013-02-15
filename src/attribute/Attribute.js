@@ -240,7 +240,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 				
 			} else {
 				// No registered type with the given config's `type`, throw an error
-				throw new Error( "Kevlar.attribute.Attribute: Unknown Attribute type: '" + type + "'" );
+				new Kevlar.Error( "Kevlar.attribute.Attribute: Unknown Attribute type: '" + type + "'" );
 			}
 		},
 		
@@ -264,7 +264,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 			if( !this.attributeTypes[ type ] ) { 
 				this.attributeTypes[ type ] = jsClass;
 			} else {
-				throw new Error( "Error: Attribute type '" + type + "' already exists" );
+				new Kevlar.Error( "Error: Attribute type '" + type + "' already exists" );
 			}
 		},
 		
@@ -327,7 +327,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 		// Each Attribute must have a name.
 		var name = me.name;
 		if( name === undefined || name === null || name === "" ) {
-			throw new Error( "no 'name' property provided to Kevlar.attribute.Attribute constructor" );
+			new Kevlar.Error( "no 'name' property provided to Kevlar.attribute.Attribute constructor" );
 			
 		} else if( typeof me.name === 'number' ) {  // convert to a string if it is a number
 			me.name = name.toString();

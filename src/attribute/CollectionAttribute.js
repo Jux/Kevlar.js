@@ -77,7 +77,7 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 		// a class that either doesn't exist, or doesn't exist yet, and we should give them an error to alert them).
 		// <debug>
 		if( 'collectionClass' in this && this.collectionClass === undefined ) {
-			throw new Error( "The 'collectionClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
+			new Kevlar.Error( "The 'collectionClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
 			                 "exist just yet. Consider using the String or Function form of the collectionClass config for late binding, if needed" );
 		}
 		// </debug>
@@ -126,12 +126,12 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 				collectionClass = this.resolveGlobalPath( collectionClass );  // changes the string "a.b.c" into the value at `window.a.b.c`
 				
 				if( !collectionClass ) {
-					throw new Error( "The string value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The string value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
 				}
 			} else if( typeof collectionClass === 'function' && !Class.isSubclassOf( collectionClass, Kevlar.Collection ) ) {  // it's not a Kevlar.Collection subclass, so it must be an anonymous function. Run it, so it returns the Collection reference we need
 				this.collectionClass = collectionClass = collectionClass();
 				if( !collectionClass ) {
-					throw new Error( "The function value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The function value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
 				}
 			}
 			
@@ -155,7 +155,7 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 	afterSet : function( model, value ) {
 		// Enforce that the value is either null, or a Kevlar.Collection
 		if( value !== null && !( value instanceof Kevlar.Collection ) ) {
-			throw new Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Collection subclass" );
+			new Kevlar.Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Collection subclass" );
 		}
 		
 		if( this.embedded && value instanceof Kevlar.Collection ) {

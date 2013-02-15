@@ -294,7 +294,7 @@ Kevlar.Collection = Kevlar.DataComponent.extend( {
 	 */
 	createModel : function( modelData ) {
 		if( !this.model ) {
-			throw new Error( "Cannot instantiate model from anonymous data, 'model' config not provided to Collection." );
+			new Kevlar.Error( "Cannot instantiate model from anonymous data, 'model' config not provided to Collection." );
 		}
 		
 		return new this.model( modelData );

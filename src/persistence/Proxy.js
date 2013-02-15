@@ -88,13 +88,13 @@ Kevlar.apply( Kevlar.persistence.Proxy, {
 		
 		type = type.toLowerCase();
 		if( typeof proxyClass !== 'function' ) {
-			throw new Error( "A Proxy subclass constructor function must be provided to registerProxy()" );
+			new Kevlar.Error( "A Proxy subclass constructor function must be provided to registerProxy()" );
 		}
 		
 		if( !Proxy.proxies[ type ] ) { 
 			Proxy.proxies[ type ] = proxyClass;
 		} else {
-			throw new Error( "Error: Proxy type '" + type + "' already registered." );
+			new Kevlar.Error( "Error: Proxy type '" + type + "' already registered." );
 		}
 	},
 	
@@ -125,11 +125,11 @@ Kevlar.apply( Kevlar.persistence.Proxy, {
 			
 		} else if( !( 'type' in config ) ) {
 			// No `type` property provided on config object
-			throw new Error( "Kevlar.persistence.Proxy.create(): No `type` property provided on persistenceProxy config object" );
+			new Kevlar.Error( "Kevlar.persistence.Proxy.create(): No `type` property provided on persistenceProxy config object" );
 			 
 		} else {
 			// No registered Proxy type with the given type, throw an error
-			throw new Error( "Kevlar.persistence.Proxy.create(): Unknown Proxy type: '" + type + "'" );
+			new Kevlar.Error( "Kevlar.persistence.Proxy.create(): Unknown Proxy type: '" + type + "'" );
 		}
 	}
 

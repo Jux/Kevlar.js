@@ -433,7 +433,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	getId : function() {
 		// Provide a friendlier error message than what get() provides if the idAttribute is not an Attribute of the Model
 		if( !( this.idAttribute in this.attributes ) ) {
-			throw new Error( "Error: The `idAttribute` (currently set to an attribute named '" + this.idAttribute + "') was not found on the Model. Set the `idAttribute` config to the name of the id attribute in the Model. The model can't be saved or destroyed without it." );
+			new Kevlar.Error( "Error: The `idAttribute` (currently set to an attribute named '" + this.idAttribute + "') was not found on the Model. Set the `idAttribute` config to the name of the id attribute in the Model. The model can't be saved or destroyed without it." );
 		}
 		return this.get( this.idAttribute );
 	},
@@ -519,7 +519,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 				if( values.hasOwnProperty( fldName ) ) {
 					// <debug>
 					if( !attributes[ fldName ] ) {
-						throw new Error( "Kevlar.Model.set(): An attribute with the attributeName '" + fldName + "' was not found." );
+						new Kevlar.Error( "Kevlar.Model.set(): An attribute with the attributeName '" + fldName + "' was not found." );
 					}
 					// </debug>
 					if( attributes[ fldName ].hasUserDefinedSetter() ) {   // defer setting the values on attributes with user-defined setters until all attributes without user-defined setters have been set
@@ -541,7 +541,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			
 			// <debug>
 			if( !attribute ) {
-				throw new Error( "Kevlar.Model.set(): An attribute with the attributeName '" + attributeName + "' was not found." );
+				new Kevlar.Error( "Kevlar.Model.set(): An attribute with the attributeName '" + attributeName + "' was not found." );
 			}
 			// </debug>
 			
@@ -642,7 +642,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	get : function( attributeName ) {
 		// <debug>
 		if( !( attributeName in this.attributes ) ) {
-			throw new Error( "Kevlar.Model::get() error: attribute '" + attributeName + "' was not found on the Model." );
+			new Kevlar.Error( "Kevlar.Model::get() error: attribute '" + attributeName + "' was not found on the Model." );
 		}
 		// </debug>
 		
@@ -673,7 +673,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	raw : function( attributeName ) {
 		// <debug>
 		if( !( attributeName in this.attributes ) ) {
-			throw new Error( "Kevlar.Model::raw() error: attribute '" + attributeName + "' was not found on the Model." );
+			new Kevlar.Error( "Kevlar.Model::raw() error: attribute '" + attributeName + "' was not found on the Model." );
 		}
 		// </debug>
 		
@@ -1227,7 +1227,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		
 		// No persistenceProxy, cannot load. Throw an error
 		if( !this.persistenceProxy ) {
-			throw new Error( "Kevlar.Model::reload() error: Cannot load. No persistenceProxy." );
+			new Kevlar.Error( "Kevlar.Model::reload() error: Cannot load. No persistenceProxy." );
 		}
 		
 		var proxyOptions = {
@@ -1262,12 +1262,12 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		
 		// No persistenceProxy, cannot save. Throw an error
 		if( !this.persistenceProxy ) {
-			throw new Error( "Kevlar.Model::save() error: Cannot save. No persistenceProxy." );
+			new Kevlar.Error( "Kevlar.Model::save() error: Cannot save. No persistenceProxy." );
 		}
 		
 		// No id attribute, throw an error
 		if( !this.hasIdAttribute ) {
-			throw new Error( "Kevlar.Model::save() error: Cannot save. Model does not have an idAttribute that relates to a valid attribute." );
+			new Kevlar.Error( "Kevlar.Model::save() error: Cannot save. Model does not have an idAttribute that relates to a valid attribute." );
 		}
 		
 		
@@ -1356,7 +1356,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			// No persistenceProxy, cannot destroy. Throw an error
 			// <debug>
 			if( !this.persistenceProxy ) {
-				throw new Error( "Kevlar.Model::destroy() error: Cannot destroy model on server. No persistenceProxy." );
+				new Kevlar.Error( "Kevlar.Model::destroy() error: Cannot destroy model on server. No persistenceProxy." );
 			}
 			// </debug>
 			

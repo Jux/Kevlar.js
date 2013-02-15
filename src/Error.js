@@ -1,8 +1,10 @@
 Kevlar.Error = Kevlar.extend(Object, {
 
   statics: {
+    // Used to determine whether any errors can be thrown or simply logged
     ableToThrowError: true,
 
+    // Globally set whether any Kevlar Errors can throw an error or not
     setAbleToThrowError: function( value ){
       value = !!value;
       Kevlar.Error.ableToThrowError = value;
@@ -14,6 +16,7 @@ Kevlar.Error = Kevlar.extend(Object, {
   constructor: function(msg){
     this._super(arguments);
 
+    // If a message is not passed in, throw an error about not being provided one.
     if(!msg){
       new Kevlar.Error(this.defaultMessage);
       return;
@@ -21,6 +24,9 @@ Kevlar.Error = Kevlar.extend(Object, {
       this.message = msg;
     }
 
+
+    // Check if throwing errors is allowed, if it is then throw it.  OTherwise, pass it to the logging error
+    // method
     if(this.canThrowError()){
       this.throwError();
     } else {

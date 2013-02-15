@@ -60,7 +60,7 @@ tests.integration.add( new Ext.test.TestSuite( {
 
 			// Tests making sure that the same type/id returns the same model instance, and combines the data
 			
-			"Instantiating two models of both the same type, and which have the same instance ID, and passing in a true flag as the second value should prevent the model from using the new data" : function() {
+			"Instantiating two models of both the same type, and which have the same instance ID, and passing in a true flag as the second value will not prevent the model from using the new data" : function() {
 				var Model = Kevlar.Model.extend( {
 					attributes : [ 'id', 'name' ],
 					idAttribute : 'id'
@@ -78,7 +78,7 @@ tests.integration.add( new Ext.test.TestSuite( {
 				
 				// Make sure that only one model was created for id 1
 				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
-				Y.Assert.isFalse(changeEventFired);
+				Y.Assert.isTrue(changeEventFired);
 			},
 
 			"Instantiating two models of both the same type, and which have the same instance ID, and not passing in a true flag as the second value should set the new data and cause change events" : function() {

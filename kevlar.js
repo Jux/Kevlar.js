@@ -3075,13 +3075,13 @@ Kevlar.apply( Kevlar.persistence.Proxy, {
 		
 		type = type.toLowerCase();
 		if( typeof proxyClass !== 'function' ) {
-			throw new Error( "A Proxy subclass constructor function must be provided to registerProxy()" );
+			new Kevlar.Error( "A Proxy subclass constructor function must be provided to registerProxy()" );
 		}
 		
 		if( !Proxy.proxies[ type ] ) { 
 			Proxy.proxies[ type ] = proxyClass;
 		} else {
-			throw new Error( "Error: Proxy type '" + type + "' already registered." );
+			new Kevlar.Error( "Error: Proxy type '" + type + "' already registered." );
 		}
 	},
 	
@@ -3112,11 +3112,11 @@ Kevlar.apply( Kevlar.persistence.Proxy, {
 			
 		} else if( !( 'type' in config ) ) {
 			// No `type` property provided on config object
-			throw new Error( "Kevlar.persistence.Proxy.create(): No `type` property provided on persistenceProxy config object" );
+			new Kevlar.Error( "Kevlar.persistence.Proxy.create(): No `type` property provided on persistenceProxy config object" );
 			 
 		} else {
 			// No registered Proxy type with the given type, throw an error
-			throw new Error( "Kevlar.persistence.Proxy.create(): Unknown Proxy type: '" + type + "'" );
+			new Kevlar.Error( "Kevlar.persistence.Proxy.create(): Unknown Proxy type: '" + type + "'" );
 		}
 	}
 
@@ -3488,7 +3488,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			me.set( data );   // set any provided initial data to the already-existing instance (as to combine them),
 			return me;        // and then return the already-existing instance
 		}
-		
+
 		
 		// --------------------------
 		
@@ -3502,6 +3502,32 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			me.constructor.prototype.persistenceProxy = Kevlar.persistence.Proxy.create( me.persistenceProxy );
 		}
 		
+		
+		// Set the default values for attributes that don't have an initial value.
+		var attributes = me.attributes,  // me.attributes is a hash of the Attribute objects, keyed by their name
+		    attributeDefaultValue;
+		for( var name in attributes ) {
+			if( data[ name ] === undefined && ( attributeDefaultValue = attributes[ name ].getDefaultValue() ) !== undefined ) {
+				data[ name ] = attributeDefaultValue;
+			}
+		}
+		
+		// Initialize the underlying data object, which stores all attribute values
+		me.data = {};
+		
+		// Initialize the data hash for storing attribute names of modified data, and their original values (see property description)
+		me.modifiedData = {};
+		
+		// Initialize the embeddedDataComponentChangeHandlers and embeddedCollectionAddRemoveReorderHandlers hashmaps
+		me.embeddedDataComponentChangeHandlers = {};
+		me.embeddedCollectionAddRemoveReorderHandlers = {};
+		
+		// Set the initial data / defaults, if we have any
+		me.set( data );
+		me.commit();  // and because we are initializing, the data is not dirty
+				
+		// Call hook method for subclasses
+		me.initialize();
 		
 		me.addEvents(
 			/**
@@ -3569,33 +3595,6 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			 */
 			'destroy'
 		);
-		
-		
-		// Set the default values for attributes that don't have an initial value.
-		var attributes = me.attributes,  // me.attributes is a hash of the Attribute objects, keyed by their name
-		    attributeDefaultValue;
-		for( var name in attributes ) {
-			if( data[ name ] === undefined && ( attributeDefaultValue = attributes[ name ].getDefaultValue() ) !== undefined ) {
-				data[ name ] = attributeDefaultValue;
-			}
-		}
-		
-		// Initialize the underlying data object, which stores all attribute values
-		me.data = {};
-		
-		// Initialize the data hash for storing attribute names of modified data, and their original values (see property description)
-		me.modifiedData = {};
-		
-		// Initialize the embeddedDataComponentChangeHandlers and embeddedCollectionAddRemoveReorderHandlers hashmaps
-		me.embeddedDataComponentChangeHandlers = {};
-		me.embeddedCollectionAddRemoveReorderHandlers = {};
-		
-		// Set the initial data / defaults, if we have any
-		me.set( data );
-		me.commit();  // and because we are initializing, the data is not dirty
-		
-		// Call hook method for subclasses
-		me.initialize();
 	},
 	
 	
@@ -3649,7 +3648,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	getId : function() {
 		// Provide a friendlier error message than what get() provides if the idAttribute is not an Attribute of the Model
 		if( !( this.idAttribute in this.attributes ) ) {
-			throw new Error( "Error: The `idAttribute` (currently set to an attribute named '" + this.idAttribute + "') was not found on the Model. Set the `idAttribute` config to the name of the id attribute in the Model. The model can't be saved or destroyed without it." );
+			new Kevlar.Error( "Error: The `idAttribute` (currently set to an attribute named '" + this.idAttribute + "') was not found on the Model. Set the `idAttribute` config to the name of the id attribute in the Model. The model can't be saved or destroyed without it." );
 		}
 		return this.get( this.idAttribute );
 	},
@@ -3735,7 +3734,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 				if( values.hasOwnProperty( fldName ) ) {
 					// <debug>
 					if( !attributes[ fldName ] ) {
-						throw new Error( "Kevlar.Model.set(): An attribute with the attributeName '" + fldName + "' was not found." );
+						new Kevlar.Error( "Kevlar.Model.set(): An attribute with the attributeName '" + fldName + "' was not found." );
 					}
 					// </debug>
 					if( attributes[ fldName ].hasUserDefinedSetter() ) {   // defer setting the values on attributes with user-defined setters until all attributes without user-defined setters have been set
@@ -3757,7 +3756,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			
 			// <debug>
 			if( !attribute ) {
-				throw new Error( "Kevlar.Model.set(): An attribute with the attributeName '" + attributeName + "' was not found." );
+				new Kevlar.Error( "Kevlar.Model.set(): An attribute with the attributeName '" + attributeName + "' was not found." );
 			}
 			// </debug>
 			
@@ -3858,7 +3857,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	get : function( attributeName ) {
 		// <debug>
 		if( !( attributeName in this.attributes ) ) {
-			throw new Error( "Kevlar.Model::get() error: attribute '" + attributeName + "' was not found on the Model." );
+			new Kevlar.Error( "Kevlar.Model::get() error: attribute '" + attributeName + "' was not found on the Model." );
 		}
 		// </debug>
 		
@@ -3889,7 +3888,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 	raw : function( attributeName ) {
 		// <debug>
 		if( !( attributeName in this.attributes ) ) {
-			throw new Error( "Kevlar.Model::raw() error: attribute '" + attributeName + "' was not found on the Model." );
+			new Kevlar.Error( "Kevlar.Model::raw() error: attribute '" + attributeName + "' was not found on the Model." );
 		}
 		// </debug>
 		
@@ -4443,7 +4442,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		
 		// No persistenceProxy, cannot load. Throw an error
 		if( !this.persistenceProxy ) {
-			throw new Error( "Kevlar.Model::reload() error: Cannot load. No persistenceProxy." );
+			new Kevlar.Error( "Kevlar.Model::reload() error: Cannot load. No persistenceProxy." );
 		}
 		
 		var proxyOptions = {
@@ -4478,12 +4477,12 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 		
 		// No persistenceProxy, cannot save. Throw an error
 		if( !this.persistenceProxy ) {
-			throw new Error( "Kevlar.Model::save() error: Cannot save. No persistenceProxy." );
+			new Kevlar.Error( "Kevlar.Model::save() error: Cannot save. No persistenceProxy." );
 		}
 		
 		// No id attribute, throw an error
 		if( !this.hasIdAttribute ) {
-			throw new Error( "Kevlar.Model::save() error: Cannot save. Model does not have an idAttribute that relates to a valid attribute." );
+			new Kevlar.Error( "Kevlar.Model::save() error: Cannot save. Model does not have an idAttribute that relates to a valid attribute." );
 		}
 		
 		
@@ -4572,7 +4571,7 @@ Kevlar.Model = Kevlar.DataComponent.extend( {
 			// No persistenceProxy, cannot destroy. Throw an error
 			// <debug>
 			if( !this.persistenceProxy ) {
-				throw new Error( "Kevlar.Model::destroy() error: Cannot destroy model on server. No persistenceProxy." );
+				new Kevlar.Error( "Kevlar.Model::destroy() error: Cannot destroy model on server. No persistenceProxy." );
 			}
 			// </debug>
 			
@@ -4974,7 +4973,7 @@ Kevlar.Collection = Kevlar.DataComponent.extend( {
 	 */
 	createModel : function( modelData ) {
 		if( !this.model ) {
-			throw new Error( "Cannot instantiate model from anonymous data, 'model' config not provided to Collection." );
+			new Kevlar.Error( "Cannot instantiate model from anonymous data, 'model' config not provided to Collection." );
 		}
 		
 		return new this.model( modelData );
@@ -5775,7 +5774,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 				
 			} else {
 				// No registered type with the given config's `type`, throw an error
-				throw new Error( "Kevlar.attribute.Attribute: Unknown Attribute type: '" + type + "'" );
+				new Kevlar.Error( "Kevlar.attribute.Attribute: Unknown Attribute type: '" + type + "'" );
 			}
 		},
 		
@@ -5799,7 +5798,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 			if( !this.attributeTypes[ type ] ) { 
 				this.attributeTypes[ type ] = jsClass;
 			} else {
-				throw new Error( "Error: Attribute type '" + type + "' already exists" );
+				new Kevlar.Error( "Error: Attribute type '" + type + "' already exists" );
 			}
 		},
 		
@@ -5862,7 +5861,7 @@ Kevlar.attribute.Attribute = Kevlar.extend( Object, {
 		// Each Attribute must have a name.
 		var name = me.name;
 		if( name === undefined || name === null || name === "" ) {
-			throw new Error( "no 'name' property provided to Kevlar.attribute.Attribute constructor" );
+			new Kevlar.Error( "no 'name' property provided to Kevlar.attribute.Attribute constructor" );
 			
 		} else if( typeof me.name === 'number' ) {  // convert to a string if it is a number
 			me.name = name.toString();
@@ -6397,7 +6396,7 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 		// a class that either doesn't exist, or doesn't exist yet, and we should give them an error to alert them).
 		// <debug>
 		if( 'collectionClass' in this && this.collectionClass === undefined ) {
-			throw new Error( "The 'collectionClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
+			new Kevlar.Error( "The 'collectionClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
 			                 "exist just yet. Consider using the String or Function form of the collectionClass config for late binding, if needed" );
 		}
 		// </debug>
@@ -6446,12 +6445,12 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 				collectionClass = this.resolveGlobalPath( collectionClass );  // changes the string "a.b.c" into the value at `window.a.b.c`
 				
 				if( !collectionClass ) {
-					throw new Error( "The string value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The string value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
 				}
 			} else if( typeof collectionClass === 'function' && !Class.isSubclassOf( collectionClass, Kevlar.Collection ) ) {  // it's not a Kevlar.Collection subclass, so it must be an anonymous function. Run it, so it returns the Collection reference we need
 				this.collectionClass = collectionClass = collectionClass();
 				if( !collectionClass ) {
-					throw new Error( "The function value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The function value 'collectionClass' config did not resolve to a Collection class for attribute '" + this.getName() + "'" );
 				}
 			}
 			
@@ -6475,7 +6474,7 @@ Kevlar.attribute.CollectionAttribute = Kevlar.attribute.DataComponentAttribute.e
 	afterSet : function( model, value ) {
 		// Enforce that the value is either null, or a Kevlar.Collection
 		if( value !== null && !( value instanceof Kevlar.Collection ) ) {
-			throw new Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Collection subclass" );
+			new Kevlar.Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Collection subclass" );
 		}
 		
 		if( this.embedded && value instanceof Kevlar.Collection ) {
@@ -6680,7 +6679,7 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 		// Check if the user provided a modelClass, but the value is undefined. This means that they specified
 		// a class that either doesn't exist, or doesn't exist yet, and we should give them a warning.
 		if( 'modelClass' in this && this.modelClass === undefined ) {
-			throw new Error( "The 'modelClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
+			new Kevlar.Error( "The 'modelClass' config provided to an Attribute with the name '" + this.getName() + "' either doesn't exist, or doesn't " +
 			                 "exist just yet. Consider using the String or Function form of the modelClass config for late binding, if needed" );
 		}
 	},
@@ -6728,12 +6727,12 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 				modelClass = this.resolveGlobalPath( modelClass );  // changes the string "a.b.c" into the value at `window.a.b.c`
 				
 				if( !modelClass ) {
-					throw new Error( "The string value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The string value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
 				}
 			} else if( typeof modelClass === 'function' && !Class.isSubclassOf( modelClass, Kevlar.Model ) ) {  // it's not a Kevlar.Model subclass, so it must be an anonymous function. Run it, so it returns the Model reference we need
 				this.modelClass = modelClass = modelClass();
 				if( !modelClass ) {
-					throw new Error( "The function value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
+					new Kevlar.Error( "The function value 'modelClass' config did not resolve to a Model class for attribute '" + this.getName() + "'" );
 				}
 			}
 			
@@ -6756,7 +6755,7 @@ Kevlar.attribute.ModelAttribute = Kevlar.attribute.DataComponentAttribute.extend
 	afterSet : function( model, value ) {
 		// Enforce that the value is either null, or a Kevlar.Model
 		if( value !== null && !( value instanceof Kevlar.Model ) ) {
-			throw new Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Model subclass" );
+			new Kevlar.Error( "A value set to the attribute '" + this.getName() + "' was not a Kevlar.Model subclass" );
 		}
 		
 		if( this.embedded && value instanceof Kevlar.Model ) {
@@ -6931,6 +6930,65 @@ Kevlar.data.NativeObjectConverter = {
 	}
 	
 };
+
+Kevlar.Error = Kevlar.extend(Object, {
+
+  statics: {
+    // Used to determine whether any errors can be thrown or simply logged
+    ableToThrowError: true,
+
+    // Globally set whether any Kevlar Errors can throw an error or not
+    setAbleToThrowError: function( value ){
+      value = !!value;
+      Kevlar.Error.ableToThrowError = value;
+    }
+  },
+
+  defaultMessage: "Kevlar::Error message required to throw a Kevlar error.",
+
+  constructor: function(msg){
+    this._super(arguments);
+
+    // If a message is not passed in, throw an error about not being provided one.
+    if(!msg){
+      new Kevlar.Error(this.defaultMessage);
+      return;
+    } else {
+      this.message = msg;
+    }
+
+
+    // Check if throwing errors is allowed, if it is then throw it.  OTherwise, pass it to the logging error
+    // method
+    if(this.canThrowError()){
+      this.throwError();
+    } else {
+      this.logError(this.message);
+    }
+  },
+
+  canThrowError: function(){
+    return Kevlar.Error.ableToThrowError;
+  },
+
+  throwError: function(){
+    throw new Error(this.message);
+  },
+
+  logError: (function(){
+    if ( window.console && window.console.error ) {
+      return function( msg ){
+        console.error( msg ); 
+      };
+    } else if ( window.console && window.console.log ){
+      return function( msg ){
+        console.log( msg );     
+      };
+    } else {
+      return Jux.emptyFn;
+    }
+  }())
+});
 
 /**
  * @private

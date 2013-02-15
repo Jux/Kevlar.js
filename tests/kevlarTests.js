@@ -1607,8 +1607,9 @@ tests.unit.attribute.add( new Ext.test.TestSuite( {
 				Y.Assert.fail( "The constructor should have thrown an error if the modelClass config was provided but was undefined. This is to help with debugging when late binding for the modelClass is needed." );
 			}
 		},
-		
-		
+
+		 
+
 		/*
 		 * Test valuesAreEqual()
 		 */
@@ -1659,6 +1660,27 @@ tests.unit.attribute.add( new Ext.test.TestSuite( {
 				
 				var result = this.attribute.valuesAreEqual( model1, model2 );
 				Y.Assert.isFalse( result );
+			},
+
+			"valuesAreEqual() should return true when the user passes in the same nonreference type values": function(){
+				var result = this.attribute.valuesAreEqual("true", "true");
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return true when the user passes in two same nonreference type values that do not have any values inside of them": function(){
+				var result =  this.attribute.valuesAreEqual({}, {});
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return true when the user passes in two same nonreference type values with the same values": function(){
+				var result =  this.attribute.valuesAreEqual({ val: 1, fail: false }, {val: 1, fail: false});
+
+				Y.Assert.isTrue(result);
+			},
+			"valuesAreEqual() should return false when the user passes in two same nonreference type values with different values": function(){
+				var result = this.attribute.valuesAreEqual({ val: 1, fail: false }, {val: 1, fail: true});
+
+				Y.Assert.isFalse(result);
 			}
 		},
 		
@@ -4137,6 +4159,98 @@ tests.unit.data.add( new Ext.test.TestSuite( {
 		}
 	]
 
+} ) );
+
+/*global window, jQuery, Ext, Y, tests, Kevlar */
+/*jslint evil:true */
+tests.unit.add( new Ext.test.TestSuite( {
+	
+	name: 'Kevlar.Error',
+	
+	items : [
+		
+		/*
+		 * Test Kevlar.isArray()
+		 */
+		{
+			name : "Test will throw an error when creating a Kevlar Error class normally",
+			
+			test_willThrowError: function() {
+				var err = 0;
+				try {
+					new Kevlar.Error("error");
+				} catch(e){
+					err+= 1;
+				} finally {
+					Y.Assert.areEqual(err,1);
+				}
+			}
+		},
+		{
+			name : "Test will throw an error when creating a Kevlar Error class without a message",
+			
+			test_willThrowError: function() {
+				var err = 0;
+				try {
+					new Kevlar.Error();
+				} catch(e){
+					err+= 1;
+				} finally {
+					Y.Assert.areEqual(err,1);
+				}
+			}
+		},	
+
+		{
+			name : "Test will not throw an error when the class is value of canThrowError is false",
+			
+			test_willThrowError: function() {
+				Kevlar.Error.setAbleToThrowError(false);
+
+				var err = 0;
+				try {
+					new Kevlar.Error();
+				} catch(e){
+					err+= 1;
+				} finally {
+					Y.Assert.areEqual(err,0);
+				}
+			}
+		},	
+
+		{
+			name : "Test will not throw an error when the class is value of canThrowError is false",
+			
+			test_willThrowError: function() {
+				Kevlar.Error.setAbleToThrowError(false);
+
+				var err = 0;
+				try {
+					new Kevlar.Error();
+					new Kevlar.Error();
+					new Kevlar.Error();
+					new Kevlar.Error();
+				} catch(e){
+					err+= 1;
+				} finally {
+					Y.Assert.areEqual(err,0);
+				}
+			}
+		},
+
+
+		// Has to run in order to allow other tests which rely on KEvlar.Error class to throw an error to run 
+		{
+			name: "Test will reset can throw error to true",
+			test_resetsValue: function(){
+				Kevlar.Error.setAbleToThrowError(true);
+				Y.Assert.areEqual(Kevlar.Error.ableToThrowError, true)
+			}
+		}
+			
+		
+	]
+	
 } ) );
 
 /*global window, Ext, Y, JsMockito, tests, Kevlar */
@@ -8612,6 +8726,48 @@ tests.integration.add( new Ext.test.TestSuite( {
 				
 				// Make sure that only one model was created for id 1
 				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
+			},
+
+			// Tests making sure that the same type/id returns the same model instance, and combines the data
+			
+			"Instantiating two models of both the same type, and which have the same instance ID, and passing in a true flag as the second value will not prevent the model from using the new data" : function() {
+				var Model = Kevlar.Model.extend( {
+					attributes : [ 'id', 'name' ],
+					idAttribute : 'id'
+				} );
+				
+				var changeEventFired = false;
+
+				var model1 = new Model( { id: 1, name: 'firstValue' } );
+				model1.on('change:name', function(){
+					changeEventFired = true;
+				});
+
+				// Passing in true will prevent the data from overwriting the first dataset but the model returned/created will still point to the original model
+				var model2 = new Model( { id: 1, name: 'secondValue' }, true );
+				
+				// Make sure that only one model was created for id 1
+				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
+				Y.Assert.isTrue(changeEventFired);
+			},
+
+			"Instantiating two models of both the same type, and which have the same instance ID, and not passing in a true flag as the second value should set the new data and cause change events" : function() {
+				var Model = Kevlar.Model.extend( {
+					attributes : [ 'id', 'name' ],
+					idAttribute : 'id'
+				} );
+				var changeEventFired = false;
+
+				var model1 = new Model( { id: 1, name: 'firstValue' } );
+				model1.on('change:name', function(){
+					changeEventFired = true;
+				});
+
+				var model2 = new Model( { id: 1, name: 'secondValue' } );
+				
+				// Make sure that only one model was created for id 1
+				Y.Assert.areSame( model1, model2, "model1 and model2 should point to the same object" );
+				Y.Assert.isTrue(changeEventFired);
 			},
 
 

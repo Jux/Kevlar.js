@@ -1,3 +1,8 @@
-.project
 .externalToolBuilders
+.project
+docs/*
+kevlar.js
+kevlar.min.js
+tests/kevlarTests.js
+tests/kevlarTests.min.js
 web.config
